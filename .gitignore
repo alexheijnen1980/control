@@ -2,3 +2,4 @@
 install-ubuntu.sh
 cserver_dir/
 pid_controller/*/
+!pid_controller/screenshot/
