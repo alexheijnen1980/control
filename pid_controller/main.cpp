@@ -215,18 +215,13 @@ int main ()
   time(&prev_timer);
 
   // initialize pid steer
-  /**
-  * TODO (Step 1): create pid (pid_steer) for steer command and initialize values
-  **/
-
-
-  // initialize pid throttle
-  /**
-  * TODO (Step 1): create pid (pid_throttle) for throttle command and initialize values
-  **/
-
+  // TODO (Step 1): create pid (pid_steer) for steer command and initialize values
   PID pid_steer = PID();
+  
+  // initialize pid throttle
+  //TODO (Step 1): create pid (pid_throttle) for throttle command and initialize values
   PID pid_throttle = PID();
+  pid_throttle.Init(0.2, 0.004, 3.0, 1.0, -1.0); // using values from lecture 11
 
   h.onMessage([&pid_steer, &pid_throttle, &new_delta_time, &timer, &prev_timer, &i, &prev_timer](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode)
   {
@@ -326,46 +321,46 @@ int main ()
           * TODO (step 2): uncomment these lines
           **/
 //           // Update the delta time with the previous command
-//           pid_throttle.UpdateDeltaTime(new_delta_time);
+          pid_throttle.UpdateDeltaTime(new_delta_time);
 
           // Compute error of speed
+          // TODO (step 2): compute the throttle error (error_throttle) from the position and the desired speed
           double error_throttle;
-          /**
-          * TODO (step 2): compute the throttle error (error_throttle) from the position and the desired speed
-          **/
-          // modify the following line for step 2
-          error_throttle = 0;
-
-
-
+          double target_velocity = v_points.back();
+          
+          // Calculate error
+          error_throttle = velocity - target_velocity;
+          cout << "target velocity: " << target_velocity;
+          cout << " actual velocity: " << velocity;
+          cout << " error_throttle: " << error_throttle << endl;
+          
+          // Compute control to apply
           double throttle_output;
           double brake_output;
+          pid_throttle.UpdateError(error_throttle);
+          double throttle = pid_throttle.TotalError();
+          
+          cout << "control command: " << throttle << endl;
 
-          /**
-          * TODO (step 2): uncomment these lines
-          **/
-//           // Compute control to apply
-//           pid_throttle.UpdateError(error_throttle);
-//           double throttle = pid_throttle.TotalError();
-
-//           // Adapt the negative throttle to break
-//           if (throttle > 0.0) {
-//             throttle_output = throttle;
-//             brake_output = 0;
-//           } else {
-//             throttle_output = 0;
-//             brake_output = -throttle;
-//           }
-
-//           // Save data
-//           file_throttle.seekg(std::ios::beg);
-//           for(int j=0; j < i - 1; ++j){
-//               file_throttle.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
-//           }
-//           file_throttle  << i ;
-//           file_throttle  << " " << error_throttle;
-//           file_throttle  << " " << brake_output;
-//           file_throttle  << " " << throttle_output << endl;
+          // Adapt the negative throttle to break
+          if (throttle > 0.0) {
+            throttle_output = throttle;
+            brake_output = 0;
+          } else {
+            throttle_output = 0;
+            brake_output = -throttle;
+          }
+          cout << "throttle output " << throttle_output << " brake output: " << brake_output << endl;
+          
+          // Save data
+          file_throttle.seekg(std::ios::beg);
+          for(int j=0; j < i - 1; ++j){
+              file_throttle.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+          }
+          file_throttle  << i ;
+          file_throttle  << " " << error_throttle;
+          file_throttle  << " " << brake_output;
+          file_throttle  << " " << throttle_output << endl;
 
 
           // Send control

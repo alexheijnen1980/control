@@ -17,20 +17,24 @@ class PID {
         /*
         * Errors
         */
-        double error;
-
+        double proportional_part;
+        double integral_part;
+        double derivative_part;
+        double int_cte; // in support of the integral part
+        double prev_cte; // in support of the derivative part
+        
         /*
         * Coefficients
         */
-        double Kp;
-        double Ki;
-        double Kd; 
+        double Kp; // proportional gain
+        double Ki; // integral gain
+        double Kd; // derivative gain
 
         /*
         * Output limits
         */
-        double output_lim_max;
         double output_lim_min;
+        double output_lim_max;
 
         /*
         * Delta time
