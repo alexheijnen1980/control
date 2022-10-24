@@ -217,11 +217,12 @@ int main ()
   // initialize pid steer
   // TODO (Step 1): create pid (pid_steer) for steer command and initialize values
   PID pid_steer = PID();
+  pid_steer.Init(0.3, 0.004, 0.3, 1.2, -1.2); 
   
   // initialize pid throttle
   //TODO (Step 1): create pid (pid_throttle) for throttle command and initialize values
   PID pid_throttle = PID();
-  pid_throttle.Init(0.2, 0.004, 3.0, 1.0, -1.0); // using values from lecture 11
+  pid_throttle.Init(0.05, 0.02, 0.05, 1.0, -1.0); 
 
   h.onMessage([&pid_steer, &pid_throttle, &new_delta_time, &timer, &prev_timer, &i, &prev_timer](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode)
   {
@@ -279,48 +280,54 @@ int main ()
           ////////////////////////////////////////
           // Steering control
           ////////////////////////////////////////
-
-          /**
-          * TODO (step 3): uncomment these lines
-          **/
-//           // Update the delta time with the previous command
-//           pid_steer.UpdateDeltaTime(new_delta_time);
+          // TODO (step 3): uncomment these lines
+          // Update the delta time with the previous command
+          pid_steer.UpdateDeltaTime(new_delta_time);
 
           // Compute steer error
+          // TODO (step 3): compute the steer error (error_steer) from the position and the desired trajectory
           double error_steer;
+          double current_yaw = yaw;
+          double target_steer = 0.0;
 
-
-          double steer_output;
-
-          /**
-          * TODO (step 3): compute the steer error (error_steer) from the position and the desired trajectory
-          **/
-//           error_steer = 0;
-
-          /**
-          * TODO (step 3): uncomment these lines
-          **/
-//           // Compute control to apply
-//           pid_steer.UpdateError(error_steer);
-//           steer_output = pid_steer.TotalError();
-
-//           // Save data
-//           file_steer.seekg(std::ios::beg);
-//           for(int j=0; j < i - 1; ++j) {
-//               file_steer.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//           }
-//           file_steer  << i ;
-//           file_steer  << " " << error_steer;
-//           file_steer  << " " << steer_output << endl;
+          // Calculate error
+          if( x_points.size() > 1 ) {
+            target_steer = angle_between_points(x_points[x_points.size()-2], y_points[y_points.size()-2], x_points[x_points.size()-1], y_points[y_points.size()-1]);
+            if(velocity < 0.01) {
+              target_steer = yaw;
+            }
+          }
+                    
+          error_steer = target_steer - current_yaw;
+                              
+          // Compute control to apply
+          double steer_output; 
+          pid_steer.UpdateError(error_steer);
+          steer_output = pid_steer.TotalError();
+          cout << "target: " << target_steer;
+          cout << " current yaw: " << current_yaw;
+          cout << " error steer: " << error_steer;
+          cout << " steer output: " << steer_output << endl;
+//           cout << "proportional part: " << pid_steer.proportional_part;
+//           cout << " integral part: " << pid_steer.integral_part;
+//           cout << " derivative part: " << pid_steer.derivative_part << endl;
+          
+          // Save data
+          file_steer.seekg(std::ios::beg);
+          for(int j=0; j < i - 1; ++j) {
+              file_steer.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+          }
+          file_steer  << i ;
+          file_steer  << " " << current_yaw;
+          file_steer  << " " << target_steer;  
+          file_steer  << " " << error_steer;
+          file_steer  << " " << steer_output << endl;
 
           ////////////////////////////////////////
           // Throttle control
-          ////////////////////////////////////////
-
-          /**
-          * TODO (step 2): uncomment these lines
-          **/
-//           // Update the delta time with the previous command
+          ////////////////////////////////////////         
+          // TODO (step 2): uncomment these lines
+          // Update the delta time with the previous command
           pid_throttle.UpdateDeltaTime(new_delta_time);
 
           // Compute error of speed
@@ -330,17 +337,20 @@ int main ()
           
           // Calculate error
           error_throttle = velocity - target_velocity;
-          cout << "target velocity: " << target_velocity;
-          cout << " actual velocity: " << velocity;
-          cout << " error_throttle: " << error_throttle << endl;
+          // cout << "target velocity: " << target_velocity;
+          // cout << " actual velocity: " << velocity;
+          // cout << " error_throttle: " << error_throttle << endl;
           
           // Compute control to apply
           double throttle_output;
           double brake_output;
           pid_throttle.UpdateError(error_throttle);
           double throttle = pid_throttle.TotalError();
+          // cout << "proportional part: " << pid_throttle.proportional_part;
+          // cout << " integral part: " << pid_throttle.integral_part;
+          // cout << " derivative part: " << pid_throttle.derivative_part << endl;
           
-          cout << "control command: " << throttle << endl;
+          // cout << "control command: " << throttle << endl;
 
           // Adapt the negative throttle to break
           if (throttle > 0.0) {
@@ -350,7 +360,7 @@ int main ()
             throttle_output = 0;
             brake_output = -throttle;
           }
-          cout << "throttle output " << throttle_output << " brake output: " << brake_output << endl;
+          // cout << "throttle output " << throttle_output << " brake output: " << brake_output << endl;
           
           // Save data
           file_throttle.seekg(std::ios::beg);
@@ -380,7 +390,7 @@ int main ()
 
           //  min point threshold before doing the update
           // for high update rate use 19 for slow update rate use 4
-          msgJson["update_point_thresh"] = 16;
+          msgJson["update_point_thresh"] = 19;
 
           auto msg = msgJson.dump();
 

@@ -851,7 +851,7 @@ def game_loop(args):
                 waypoint_x, waypoint_y, waypoint_t, waypoint_j = world.get_waypoint(x_points[-1], y_points[-1])
                 real_v = world.player.get_velocity()
                 velocity = math.sqrt(real_v.x**2 + real_v.y**2)
-                print('velocity sent: ', velocity)
+                # print('velocity sent: ', velocity)
 
                 t = world.player.get_transform()
                 location_x = t.location.x
@@ -905,9 +905,9 @@ def get_data():
     throttle = data['throttle']
     brake = data['brake']
 
-    print('steer: ', steer)
-    print('throttle: ', throttle)
-    print('brake: ', brake)
+    # print('steer: ', steer)
+    # print('throttle: ', throttle)
+    # print('brake: ', brake)
 
     # Start at the point that is closest to the start way point
     if( len(way_points) > 1):
