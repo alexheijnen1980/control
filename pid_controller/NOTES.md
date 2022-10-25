@@ -1,16 +1,17 @@
 # Step 1: build the PID controller object
 
-https://knowledge.udacity.com/questions/852973
-
-pid_steer.Init(0.3, 0.001, 0.3, 0.8, -0.8);
-pid_throttle.Init(0.2, 0.001, 0.1, 1.0, -1.0); 
-
-Ideas:
-*The factor cos^2(sw(k)) avoids big accelerations or decelerations when the front wheels are rotated.*
-
-
-**pid_controller.cpp**
 ```
+void PID::Init(double Kpi, double Kii, double Kdi, double output_lim_maxi, double output_lim_mini) {
+   // TODO: Initialize PID coefficients (and errors, if needed)
+   Kp = Kpi;
+   Ki = Kii;
+   Kd = Kdi;
+   output_lim_max = output_lim_maxi;
+   output_lim_min = output_lim_mini;
+   prev_cte = 0.0; // initialize as zero
+   int_cte = 0.0; // initialize as zero
+}
+
 void PID::Init(double Kpi, double Kii, double Kdi, double output_lim_maxi, double output_lim_mini) {
    // TODO: Initialize PID coefficients (and errors, if needed)
    Kp = Kpi;
@@ -55,7 +56,7 @@ double PID::TotalError() {
 ```
 
 **main.cpp**
-```
+```c++
 ////////////////////////////////////////
 // Throttle control
 ////////////////////////////////////////

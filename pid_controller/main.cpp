@@ -286,7 +286,10 @@ int main ()
 
           // Compute steer error
           // TODO (step 3): compute the steer error (error_steer) from the position and the desired trajectory
+          // TODO (step 3): compute the steer error (error_steer) from the position and the desired trajectory
           double error_steer;
+          double current_yaw = yaw;
+          double target_steer = 0.0;
           double current_yaw = yaw;
           double target_steer = 0.0;
 
@@ -297,11 +300,7 @@ int main ()
             if(velocity < 0.01) {
               target_steer = yaw;
             }
-          }
-
-
-
-                    
+          }                  
           error_steer = target_steer - current_yaw;
                               
           // Compute control to apply
@@ -341,9 +340,9 @@ int main ()
           
           // Calculate error
           error_throttle = velocity - target_velocity;
-          // cout << "target velocity: " << target_velocity;
-          // cout << " actual velocity: " << velocity;
-          // cout << " error_throttle: " << error_throttle << endl;
+          // // cout << "target velocity: " << target_velocity;
+          // // cout << " actual velocity: " << velocity;
+          // // cout << " error_throttle: " << error_throttle << endl;
           
           // Compute control to apply
           double throttle_output;
@@ -353,8 +352,11 @@ int main ()
           // cout << "proportional part: " << pid_throttle.proportional_part;
           // cout << " integral part: " << pid_throttle.integral_part;
           // cout << " derivative part: " << pid_throttle.derivative_part << endl;
+          // cout << "proportional part: " << pid_throttle.proportional_part;
+          // cout << " integral part: " << pid_throttle.integral_part;
+          // cout << " derivative part: " << pid_throttle.derivative_part << endl;
           
-          // cout << "control command: " << throttle << endl;
+          // // cout << "control command: " << throttle << endl;
 
           // Adapt the negative throttle to break
           if (throttle > 0.0) {
@@ -364,7 +366,7 @@ int main ()
             throttle_output = 0;
             brake_output = -throttle;
           }
-          // cout << "throttle output " << throttle_output << " brake output: " << brake_output << endl;
+          // // cout << "throttle output " << throttle_output << " brake output: " << brake_output << endl;
           
           // Save data
           file_throttle.seekg(std::ios::beg);
