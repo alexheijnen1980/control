@@ -1,10 +1,13 @@
 # Step 1: build the PID controller object
 
-Using the following parameters
-Kp = 0.2
-Ki = 0.004
-Pd = 3.0
-results in a car that is intructed to drive at high velocities, including those exceeding the max velocity of 3.0 m/s.
+https://knowledge.udacity.com/questions/852973
+
+pid_steer.Init(0.3, 0.001, 0.3, 0.8, -0.8);
+pid_throttle.Init(0.2, 0.001, 0.1, 1.0, -1.0); 
+
+Ideas:
+*The factor cos^2(sw(k)) avoids big accelerations or decelerations when the front wheels are rotated.*
+
 
 **pid_controller.cpp**
 ```
@@ -91,3 +94,26 @@ brake_output = -throttle;
 # Step 3: PID controller for throttle
 
 # Step 4: Evaluate the PID efficiency
+
+
+
+
+// Add the plots to your report and explain them (describe what you see)
+
+
+
+// What is the effect of the PID according to the plots, how each part of the PID affects the control command?
+*proportional - reacts to the absolute error - will continue to push even when the error starts to reduce derivative - reacts to the time derivative of the error - will start to push in the opposite direction when integral - reacts to the cumulative error - bias.*
+
+// How would you design a way to automatically tune the PID parameters?
+*Twiddle*
+
+// PID controller is a model free controller, i.e. it does not use a model of the car. Could you explain the pros and cons of this type of controller?
+*PID is such a controller that, when one look at its disadvantages……it looks dwarf in comparison to its tall stature in industrial applications. Let’s look at its advantages: It only acts on the error between the desired signal and the controlled signal. Hence, no extra measurements of the internal states are needed, which is one of the biggest advantage in applications because ….. more measurements mean more sensors, more signal conditioning, more maintenance, more cost.
+Apart from certain structural properties of the plant/process, not much knowledge of the plant is required for tuning. The tuning can be done through trial and error or a look-up table. Not much expertise is needed for tuning, hence, few middle-skilled technicians may easily carry out the task….again cost cutting
+It is efficient and robust against some common uncertainties if properly tuned (around an operating region).
+Easy to implement in hardware (through filters) and also easy to implement though microcontrollers, PLC etc. No fancy codes to design… can be written by a middle-level programmer.
+Disadvantages: The controller is not really suited for nonlinear plants in general or in layman language, the controller may not assure the desired performance for a changing environment/ operating points. In high-end applications like fighter aircraft, submarines, precision robotics, economic models (stock market predictions) etc, mere fulfilling of the stable performance around a fixed operating region. The controller should be able to track a reference signal under various conditions (even some of them may not be known).*
+
+// (Optional) What would you do to improve the PID controller?
+*link the two PID controllers - limit steer output as a function of velocity, limit throttle / brake as a function of steering angle*
